@@ -1,4 +1,4 @@
-const { User } = require("../models/index");
+const { User, Token } = require("../models/index");
 const bcrypt = require("bcrypt");
 const tokensService = require("./tokens.services");
 const ApiError = require("../utils/exceptions");
@@ -39,14 +39,32 @@ class AuthServices {
     const tokens = tokensService.gererateTokens(
       candidate.id,
       candidate.email,
+      candidate.username,
       candidate.role
     );
 
     await tokensService.saveRefreshToken(tokens.refreshToken, candidate.id);
-    return tokens;
+    return {
+      user: {
+        id: candidate.id,
+        email: candidate.email,
+        username: candidate.username,
+        isAdmin: candidate.role === "admin",
+      },
+      tokens,
+    };
   }
 
-  async refresh() {}
+  async logout(refreshToken) {
+    const userData = tokensService.validateRefreshToken(refreshToken);
+    const response = await Token.destroy({
+      where: { userId: userData.userId, refreshToken },
+    });
+    if (response > 0) {
+      return { message: "Вы успешно вышли из своего аккаунта" };
+    }
+    throw new Error("Произошла непредвиденная ошибка");
+  }
 }
 
 module.exports = new AuthServices();

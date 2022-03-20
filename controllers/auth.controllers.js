@@ -18,15 +18,26 @@ class AuthController {
 
   async login(req, res, next) {
     try {
-      const tokens = await authServices.login(req.body);
-      res.cookie("refreshToken", tokens.refreshToken, {
+      const data = await authServices.login(req.body);
+      res.cookie("refreshToken", data.tokens.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
       return res.json({
         message: "Вы успешно вошли в свой аккаунт",
-        token: tokens.accessToken,
+        ...data,
       });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async logout(req, res, next) {
+    try {
+      const { refreshToken } = req.cookies;
+      const response = await authServices.logout(refreshToken);
+      res.clearCookie("refreshToken");
+      return res.json(response);
     } catch (err) {
       next(err);
     }

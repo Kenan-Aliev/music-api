@@ -2,7 +2,7 @@ const router = require("express").Router();
 const trackController = require("../controllers/track.controllers");
 const roleMiddleware = require("../middlewares/role.middleware");
 
-router.get("/getAll", roleMiddleware(["user"]), trackController.getAll);
+router.get("/getAll", trackController.getAll);
 router.post("/create", roleMiddleware(["admin"]), trackController.create);
 router.post(
   "/addToTrackList",

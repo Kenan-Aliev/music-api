@@ -44,7 +44,7 @@ class TrackService {
   }
 
   async addMusicToTrackList(userId, trackId) {
-    const userTrackList = await UserTrackList.findOne({ userId });
+    const userTrackList = await UserTrackList.findOne({ where: { userId } });
     const candidate = await UserTrackList_Tracks.findOne({
       where: { trackListId: userTrackList.id, trackId },
     });
@@ -56,9 +56,10 @@ class TrackService {
       trackListId: userTrackList.id,
       trackId,
     });
-
     if (newTrack) {
-      return "Вы успешно добавили новый трек в список вашей музыки";
+      return {
+        message: "Вы успешно добавили новый трек в список вашей музыки",
+      };
     }
     throw new Error("Что-то пошло не так");
   }

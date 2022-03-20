@@ -3,16 +3,16 @@ const jwt = require("jsonwebtoken");
 const ApiError = require("../utils/exceptions");
 
 class TokenServices {
-  gererateTokens(userId, userEmail, userRole) {
+  gererateTokens(userId, userEmail, username, userRole) {
     const accessToken = jwt.sign(
-      { userId, userEmail, userRole },
+      { userId, userEmail, username, userRole },
       process.env.JWT_SECRET,
       { expiresIn: "30m" }
     );
     const refreshToken = jwt.sign(
-      { userId, userEmail, userRole },
+      { userId, userEmail, username, userRole },
       process.env.JWT_SECRET,
-      { expiresIn: "30s" }
+      { expiresIn: "30d" }
     );
 
     return {
@@ -48,10 +48,19 @@ class TokenServices {
     const tokens = this.gererateTokens(
       userData.userId,
       userData.userEmail,
+      userData.username,
       userData.userRole
     );
     await this.saveRefreshToken(tokens.refreshToken, userData.userId);
-    return tokens;
+    return {
+      user: {
+        id: userData.userId,
+        email: userData.userEmail,
+        username: userData.username,
+        isAdmin: userData.userRole === "admin",
+      },
+      tokens,
+    };
   }
 
   validateRefreshToken(refreshToken) {

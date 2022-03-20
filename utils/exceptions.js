@@ -7,7 +7,7 @@ class ApiError extends Error {
     return new ApiError(msg, 400);
   }
   static UnAuthorizedError(msg) {
-    return new ApiError(msg, 403);
+    return new ApiError(msg, 401);
   }
   static ValidationError(msg) {
     return new ApiError(msg, 422);
