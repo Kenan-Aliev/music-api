@@ -12,6 +12,9 @@ class ApiError extends Error {
   static ValidationError(msg) {
     return new ApiError(msg, 422);
   }
+  static Forbidden(msg){
+    return new ApiError(msg,403)
+  }
 }
 
 module.exports = ApiError;

@@ -19,7 +19,7 @@ module.exports = function (roles) {
         (r) => r.toLowerCase() === userData.userRole.toLowerCase()
       );
       if (!roleIsHave) {
-        throw ApiError.UnAuthorizedError("Доступ запрещен");
+        throw ApiError.Forbidden("Доступ запрещен");
       }
       req.user = userData;
       next();
