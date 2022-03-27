@@ -13,7 +13,7 @@ class GenreController {
   async getAll(req, res, next) {
     try {
       const genres = await genreService.getAll();
-      return res.json(genres);
+      return res.json({ message: "Вы успешно получили жанры", genres });
     } catch (err) {
       next(err);
     }

@@ -12,7 +12,8 @@ class GenreServices {
     }
     const genre = await Genre.create({ name: genreData.name });
     if (genre.dataValues) {
-      return "Вы успешно создали новый жанр";
+      const genres = await Genre.findAll();
+      return { genres, message: "Вы успешно создали новый жанр" };
     }
     throw new Error("Что-то пошло не так");
   }
