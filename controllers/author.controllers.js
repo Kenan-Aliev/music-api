@@ -13,7 +13,7 @@ class AuthorController {
   async getAll(req, res, next) {
     try {
       const authors = await authorServices.getAll();
-      return res.json(authors);
+      return res.json({ message: "Вы успешно получили исполнителей", authors });
     } catch (err) {
       next(err);
     }

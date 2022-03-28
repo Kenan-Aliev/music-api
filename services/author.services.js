@@ -12,7 +12,8 @@ class AuthorServices {
     }
     const author = await Author.create({ name: authorData.name });
     if (author.dataValues) {
-      return "Вы успешно создали исполнителя";
+      const authors = await Author.findAll();
+      return { authors, message: "Вы успешно создали исполнителя" };
     }
     throw new Error("Произошла непредвиденная ошибка.Повторите попытку позже");
   }
