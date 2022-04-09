@@ -4,5 +4,9 @@ const roleMiddleware = require("../middlewares/role.middleware");
 
 router.get("/getAll", roleMiddleware(["admin"]), authorController.getAll);
 router.post("/create", roleMiddleware(["admin"]), authorController.create);
-
+router.delete(
+  "/delete/:items",
+  roleMiddleware(["admin"]),
+  authorController.delete
+);
 module.exports = router;

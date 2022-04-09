@@ -22,6 +22,14 @@ class GenreServices {
     const genres = await Genre.findAll();
     return genres;
   }
+ 
+  async delete(items) {
+    for (let i = 0; i < items.length; i++) {
+      await Genre.destroy({ where: { id: items[i] } });
+    }
+    const genres = await Genre.findAll();
+    return { message: "Вы успешно удалили жанр(ы)", genres };
+  }
 }
 
 module.exports = new GenreServices();

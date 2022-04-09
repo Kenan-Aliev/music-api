@@ -22,6 +22,14 @@ class AuthorServices {
     const authors = await Author.findAll();
     return authors;
   }
+
+  async delete(items) {
+    for (let i = 0; i < items.length; i++) {
+      await Author.destroy({ where: { id: items[i] } });
+    }
+    const authors = await Author.findAll();
+    return { message: "Вы успешно удалили автора(ов)", authors };
+  }
 }
 
 module.exports = new AuthorServices();

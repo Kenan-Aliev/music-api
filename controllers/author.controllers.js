@@ -18,6 +18,16 @@ class AuthorController {
       next(err);
     }
   }
+
+  async delete(req, res, next) {
+    try {
+      const { items } = req.params;
+      const response = await authorServices.delete(JSON.parse(items));
+      return res.json(response);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new AuthorController();
