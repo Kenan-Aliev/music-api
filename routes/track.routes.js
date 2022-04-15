@@ -15,4 +15,10 @@ router.get(
   trackController.getMyTracks
 );
 
+router.delete(
+  "/delete/:tracks",
+  roleMiddleware(["admin"]),
+  trackController.deleteTracks
+);
+
 module.exports = router;

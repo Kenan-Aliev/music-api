@@ -4,8 +4,8 @@ class TrackController {
   async create(req, res, next) {
     try {
       const trackData = req.body;
-      const track = await trackService.create(trackData);
-      return res.json(track);
+      const response = await trackService.create(trackData);
+      return res.json(response);
     } catch (err) {
       next(err);
     }
@@ -14,7 +14,7 @@ class TrackController {
   async getAll(req, res, next) {
     try {
       const tracks = await trackService.getAll();
-      return res.json(tracks);
+      return res.json({ message: "Вы успешно получили все песни", tracks });
     } catch (err) {
       next(err);
     }
@@ -34,8 +34,18 @@ class TrackController {
   async getMyTracks(req, res, next) {
     try {
       const userId = req.user.userId;
-      const tracks = await trackService.getMyTracks(userId);
-      return res.json(tracks)
+      const response = await trackService.getMyTracks(userId);
+      return res.json(response);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async deleteTracks(req, res, next) {
+    try {
+      const { tracks } = req.params;
+      const response = await trackService.delete(JSON.parse(tracks));
+      return res.json(response);
     } catch (err) {
       next(err);
     }

@@ -21,7 +21,22 @@ class TrackService {
     if (!track) {
       throw new Error("Что-то пошло не так");
     }
-    return track;
+    const tracks = await Track.findAll({
+      include: [
+        {
+          model: Author,
+          attributes: ["name"],
+        },
+        {
+          model: Genre,
+          attributes: ["name"],
+        },
+      ],
+      attributes: {
+        exclude: ["genreId", "authorId"],
+      },
+    });
+    return { message: "Вы успешно добавили новую песню", tracks };
   }
 
   async getAll() {
@@ -92,7 +107,29 @@ class TrackService {
       },
     });
 
-    return tracks;
+    return { message: "Вы успешно получили ваши треки", tracks: tracks.tracks };
+  }
+
+  async delete(items) {
+    for (let i = 0; i < items.length; i++) {
+      await Track.destroy({ where: { id: items[i] } });
+    }
+    const tracks = await Track.findAll({
+      include: [
+        {
+          model: Author,
+          attributes: ["name"],
+        },
+        {
+          model: Genre,
+          attributes: ["name"],
+        },
+      ],
+      attributes: {
+        exclude: ["genreId", "authorId"],
+      },
+    });
+    return { message: "Вы успешно удалили трек(и)", tracks };
   }
 }
 
