@@ -21,4 +21,11 @@ router.delete(
   trackController.deleteTracks
 );
 
+router.delete(
+  "/deleteTrackFromTrackList/:trackId",
+  roleMiddleware(["user"]),
+  trackController.deleteTrackFromTrackList
+);
+// router.delete('/deleteFromTrackList/:trackId',roleMiddleware(["user"]),trac)
+
 module.exports = router;

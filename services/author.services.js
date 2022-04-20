@@ -1,4 +1,5 @@
 const { Author } = require("../models/index.js");
+const { Track } = require("../models/index");
 const ApiError = require("../utils/exceptions");
 const Sequelize = require("sequelize");
 
@@ -24,9 +25,25 @@ class AuthorServices {
   }
 
   async delete(items) {
-    for (let i = 0; i < items.length; i++) {
-      await Author.destroy({ where: { id: items[i] } });
+    let tracksIsHave = false;
+    for (let item of items) {
+      const track = await Track.findOne({ where: { authorId: item } });
+      if (track) {
+        tracksIsHave = true;
+        break;
+      }
     }
+
+    if (tracksIsHave) {
+      throw ApiError.ClientError(
+        "У автора(ов),которого(ых) вы хотите удалить уже имеются песни, поэтому вы не можете его(их) удалить"
+      );
+    }
+
+    for (let item of items) {
+      await Author.destroy({ where: { id: item } });
+    }
+
     const authors = await Author.findAll();
     return { message: "Вы успешно удалили автора(ов)", authors };
   }

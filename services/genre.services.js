@@ -1,4 +1,5 @@
 const { Genre } = require("../models/index.js");
+const { Track } = require("../models/index");
 const ApiError = require("../utils/exceptions");
 const Sequelize = require("sequelize");
 
@@ -22,11 +23,27 @@ class GenreServices {
     const genres = await Genre.findAll();
     return genres;
   }
- 
+
   async delete(items) {
-    for (let i = 0; i < items.length; i++) {
-      await Genre.destroy({ where: { id: items[i] } });
+    let tracksIsHave = false;
+    for (let item of items) {
+      const track = await Track.findOne({ where: { genreId: item } });
+      if (track) {
+        tracksIsHave = true;
+        break;
+      }
     }
+
+    if (tracksIsHave) {
+      throw ApiError.ClientError(
+        "У жанра(ов),которого(ых) вы хотите удалить уже имеются песни, поэтому вы не можете его(их) удалить"
+      );
+    }
+
+    for (let item of items) {
+      await Genre.destroy({ where: { id: item } });
+    }
+
     const genres = await Genre.findAll();
     return { message: "Вы успешно удалили жанр(ы)", genres };
   }

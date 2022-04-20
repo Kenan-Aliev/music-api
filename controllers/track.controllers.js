@@ -50,6 +50,20 @@ class TrackController {
       next(err);
     }
   }
+
+  async deleteTrackFromTrackList(req, res, next) {
+    try {
+      const { trackId } = req.params;
+      const userId = req.user.userId;
+      const response = await trackService.deleteTrackFromTrackList(
+        userId,
+        trackId
+      );
+      return res.json(response);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new TrackController();

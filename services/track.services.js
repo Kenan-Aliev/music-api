@@ -21,40 +21,12 @@ class TrackService {
     if (!track) {
       throw new Error("Что-то пошло не так");
     }
-    const tracks = await Track.findAll({
-      include: [
-        {
-          model: Author,
-          attributes: ["name"],
-        },
-        {
-          model: Genre,
-          attributes: ["name"],
-        },
-      ],
-      attributes: {
-        exclude: ["genreId", "authorId"],
-      },
-    });
+    const tracks = await this.getAllTracks();
     return { message: "Вы успешно добавили новую песню", tracks };
   }
 
   async getAll() {
-    const tracks = await Track.findAll({
-      include: [
-        {
-          model: Author,
-          attributes: ["name"],
-        },
-        {
-          model: Genre,
-          attributes: ["name"],
-        },
-      ],
-      attributes: {
-        exclude: ["genreId", "authorId"],
-      },
-    });
+    const tracks = await this.getAllTracks();
     return tracks;
   }
 
@@ -80,6 +52,31 @@ class TrackService {
   }
 
   async getMyTracks(userId) {
+    const tracks = await this.getUserTracks(userId);
+    return { message: "Вы успешно получили ваши треки", tracks: tracks.tracks };
+  }
+
+  async delete(items) {
+    for (let i = 0; i < items.length; i++) {
+      await Track.destroy({ where: { id: items[i] } });
+    }
+    const tracks = await this.getAllTracks();
+    return { message: "Вы успешно удалили трек(и)", tracks };
+  }
+
+  async deleteTrackFromTrackList(userId, trackId) {
+    const trackList = await UserTrackList.findOne({ where: { userId } });
+    await UserTrackList_Tracks.destroy({
+      where: { trackListId: trackList.id, trackId },
+    });
+    const userTracks = await this.getUserTracks(userId);
+    return {
+      message: "Вы успешно удалили трек из вашего списка",
+      tracks: userTracks.tracks,
+    };
+  }
+
+  async getUserTracks(userId) {
     const tracks = await UserTrackList.findOne({
       where: { userId },
       include: {
@@ -107,13 +104,10 @@ class TrackService {
       },
     });
 
-    return { message: "Вы успешно получили ваши треки", tracks: tracks.tracks };
+    return tracks;
   }
 
-  async delete(items) {
-    for (let i = 0; i < items.length; i++) {
-      await Track.destroy({ where: { id: items[i] } });
-    }
+  async getAllTracks() {
     const tracks = await Track.findAll({
       include: [
         {
@@ -129,7 +123,7 @@ class TrackService {
         exclude: ["genreId", "authorId"],
       },
     });
-    return { message: "Вы успешно удалили трек(и)", tracks };
+    return tracks;
   }
 }
 
