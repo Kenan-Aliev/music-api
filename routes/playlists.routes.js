@@ -9,7 +9,7 @@ router.get(
 );
 
 router.get(
-  "/getPlayListTracks",
+  "/getPlayListTracks/:playlistId",
   roleMiddleware(["user"]),
   playlistsController.getPlaylistTracks
 );
@@ -20,12 +20,22 @@ router.post(
   playlistsController.createNewPlaylist
 );
 
-router.post('/addTrackToPlaylists',roleMiddleware(["user"]),)
+router.post(
+  "/addTrackToPlaylists",
+  roleMiddleware(["user"]),
+  playlistsController.addNewTrackToPlaylists
+);
 
 router.delete(
   "/delete/:playlistId",
   roleMiddleware(["user"]),
   playlistsController.deleteUserPlaylist
+);
+
+router.delete(
+  "/deleteTrack/:playlistId/:trackId",
+  roleMiddleware(["user"]),
+  playlistsController.deleteTrackFromPlaylist
 );
 
 module.exports = router;

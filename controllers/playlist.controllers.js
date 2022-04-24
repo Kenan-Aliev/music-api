@@ -11,6 +11,20 @@ class PlaylistController {
     }
   }
 
+  async getPlaylistTracks(req, res, next) {
+    try {
+      const { playlistId } = req.params;
+      const userId = req.user.userId;
+      const response = await playlistServices.getPlaylistTracks(
+        userId,
+        playlistId
+      );
+      return res.json(response);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async createNewPlaylist(req, res, next) {
     try {
       const { name } = req.body;
@@ -49,13 +63,14 @@ class PlaylistController {
     }
   }
 
-  async getPlaylistTracks(req, res, next) {
+  async deleteTrackFromPlaylist(req, res, next) {
     try {
-      const { playlistId } = req.params;
+      const { playlistId, trackId } = req.params;
       const userId = req.user.userId;
-      const response = await playlistServices.getPlaylistTracks(
-        userId,
-        playlistId
+      const response = await playlistServices.deleteTrackFromPlaylist(
+        Number(playlistId),
+        Number(trackId),
+        userId
       );
       return res.json(response);
     } catch (err) {

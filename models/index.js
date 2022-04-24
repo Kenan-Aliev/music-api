@@ -103,7 +103,7 @@ const PlayList = db.define("playlists", {
   },
 });
 
-const PLayLists_Tracks = db.define("playlists_tracks", {
+const PlayLists_Tracks = db.define("playlists_tracks", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
@@ -157,8 +157,8 @@ User.hasMany(PlayList, {
 });
 PlayList.belongsTo(User, { foreignKey: "userId" });
 
-PlayList.belongsToMany(Track, { through: PLayLists_Tracks });
-Track.belongsToMany(PlayList, { through: PLayLists_Tracks });
+PlayList.belongsToMany(Track, { through: PlayLists_Tracks });
+Track.belongsToMany(PlayList, { through: PlayLists_Tracks });
 
 module.exports = {
   User,
@@ -168,6 +168,6 @@ module.exports = {
   Author,
   UserTrackList,
   PlayList,
-  PLayLists_Tracks,
+  PlayLists_Tracks,
   UserTrackList_Tracks,
 };
