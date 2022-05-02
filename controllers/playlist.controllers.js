@@ -25,6 +25,14 @@ class PlaylistController {
     }
   }
 
+  async getUsersPlaylists(req, res, next) {
+    try {
+      const response = await playlistServices.getUsersPlaylists();
+      return res.json(response);
+    } catch (err) {
+      next(err);
+    }
+  }
   async createNewPlaylist(req, res, next) {
     try {
       const { name } = req.body;

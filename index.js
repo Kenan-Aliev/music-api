@@ -36,7 +36,7 @@ server.use(errorMiddleware);
 
 const start = async () => {
   try {
-    await db.sync({});
+    await db.sync();
     server.listen(PORT, () => {
       console.log(`Server started on PORT ${PORT}`);
     });

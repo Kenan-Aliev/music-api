@@ -2,7 +2,8 @@ const { PlayList } = require("../models/index");
 const { Track } = require("../models/index");
 const { Author } = require("../models/index");
 const { Genre } = require("../models/index");
-const { PlayLists_Tracks } = require("../models/index");
+const { User } = require("../models/index");
+const sequelize = require("sequelize");
 const ApiError = require("../utils/exceptions");
 
 class PlaylistServices {
@@ -17,6 +18,38 @@ class PlaylistServices {
       message: "Вы успешно получили песни из плейлиста",
       tracks: playlistTracks.tracks,
     };
+  }
+
+  async getUsersPlaylists() {
+    const usersPlaylists = await User.findAll({
+      where: { role: "user" },
+      attributes: [
+        "id",
+        "username",
+        "email",
+        [
+          sequelize.literal(
+            '(SELECT COUNT(*) FROM "playlists" WHERE "playlists"."userId" = "users"."id")'
+          ),
+          "playlistsCount",
+        ],
+      ],
+      include: {
+        model: PlayList,
+        as: "playlists",
+        attributes: [
+          "id",
+          "playList_name",
+          [
+            sequelize.literal(
+              '(SELECT COUNT(*) FROM "playlists_tracks" WHERE "playlists"."id" = "playlists_tracks"."playlistId")'
+            ),
+            "tracksCount",
+          ],
+        ],
+      },
+    });
+    return { users: usersPlaylists };
   }
 
   async createNewPlaylist(userId, playlistName) {
@@ -66,26 +99,31 @@ class PlaylistServices {
   }
 
   async addNewTrackToPlaylists(playlists, trackId) {
-    let trackIsHave = false;
     let playlistWithTrack = "";
-    for (let playlist of playlists) {
-      console.log(playlist);
-      const candidate = await PlayLists_Tracks.findOne({
-        where: { playlistId: playlist.id, trackId },
-      });
+    let trackIsHave = false;
+    for (let pl of playlists) {
+      const playlist = await PlayList.findOne({ where: { id: pl.id } });
+      const playlistTracks = await playlist.getTracks();
+      const candidate = playlistTracks.find((track) => track.id === trackId);
       if (candidate) {
+        playlistWithTrack = pl.playList_name;
         trackIsHave = true;
-        playlistWithTrack = playlist.playList_name;
         break;
       }
     }
     if (trackIsHave) {
       throw ApiError.ClientError(
-        `Данный трек уже существует в плейлисте: ${playlistWithTrack}. Поробуйте заново добавить трек в плейлист(ы)`
+        `Данный трек уже существует в плейлисте: ${playlistWithTrack}. Попробуйте заново добавить трек в плейлист(ы)`
       );
     }
-    playlists.forEach(async (playlist) => {
-      await PlayLists_Tracks.create({ playlistId: playlist.id, trackId });
+    const track = await Track.findOne({ where: { id: trackId } });
+    playlists.forEach(async (pl) => {
+      const playlist = await PlayList.findOne({
+        where: {
+          id: pl.id,
+        },
+      });
+      await playlist.addTrack(track);
     });
 
     return { message: "Вы успешно добавили трек в плейлист(ы)" };
@@ -98,7 +136,15 @@ class PlaylistServices {
   }
 
   async deleteTrackFromPlaylist(playlistId, trackId, userId) {
-    await PlayLists_Tracks.destroy({ where: { playlistId, trackId } });
+    const playlist = await PlayList.findOne({
+      where: { id: playlistId, userId },
+    });
+    const playlistTracks = await playlist.getTracks();
+    for (let track of playlistTracks) {
+      if (track.id === trackId) {
+        await playlist.removeTrack(track);
+      }
+    }
     const tracks = await this.getPLTracks(userId, playlistId);
     return {
       message: "Вы успешно удалили трек из плейлиста",

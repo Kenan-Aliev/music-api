@@ -14,6 +14,12 @@ router.get(
   playlistsController.getPlaylistTracks
 );
 
+router.get(
+  "/getUsersPlaylists",
+  // roleMiddleware(["admin"]),
+  playlistsController.getUsersPlaylists
+);
+
 router.post(
   "/new",
   roleMiddleware(["user"]),

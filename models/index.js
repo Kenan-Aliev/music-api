@@ -2,7 +2,6 @@ const Sequelize = require("sequelize");
 const db = require("../db");
 
 //models
-
 const User = db.define("users", {
   id: {
     type: Sequelize.INTEGER,
@@ -103,62 +102,35 @@ const PlayList = db.define("playlists", {
   },
 });
 
-const PlayLists_Tracks = db.define("playlists_tracks", {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-    allowNull: false,
-  },
-});
-
-const UserTrackList_Tracks = db.define("trackLists_tracks", {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-    allowNull: false,
-  },
-});
-
 //relations
-
 Author.hasMany(Track, {
   onDelete: "cascade",
-  foreignKey: "authorId",
-  as: "tracks",
 });
-Track.belongsTo(Author, { foreignKey: "authorId" });
+Track.belongsTo(Author);
 
 Genre.hasMany(Track, {
   onDelete: "cascade",
-  foreignKey: "genreId",
-  as: "tracks",
 });
-Track.belongsTo(Genre, { foreignKey: "genreId" });
+Track.belongsTo(Genre);
 
-User.hasOne(Token, { onDelete: "cascade", foreignKey: "userId", as: "token" });
-Token.belongsTo(User, { foreignKey: "userId" });
+User.hasOne(Token, { onDelete: "cascade" });
+Token.belongsTo(User);
 
 User.hasOne(UserTrackList, {
   onDelete: "cascade",
-  foreignKey: "userId",
-  as: "trackList",
 });
-UserTrackList.belongsTo(User, { foreignKey: "userId" });
+UserTrackList.belongsTo(User);
 
-UserTrackList.belongsToMany(Track, { through: UserTrackList_Tracks });
-Track.belongsToMany(UserTrackList, { through: UserTrackList_Tracks });
+UserTrackList.belongsToMany(Track, { through: "userTrackList_tracks" });
+Track.belongsToMany(UserTrackList, { through: "userTrackList_tracks" });
 
 User.hasMany(PlayList, {
   onDelete: "cascade",
-  foreignKey: "userId",
-  as: "playlists",
 });
-PlayList.belongsTo(User, { foreignKey: "userId" });
+PlayList.belongsTo(User);
 
-PlayList.belongsToMany(Track, { through: PlayLists_Tracks });
-Track.belongsToMany(PlayList, { through: PlayLists_Tracks });
+PlayList.belongsToMany(Track, { through: "playlists_tracks" });
+Track.belongsToMany(PlayList, { through: "playlists_tracks" });
 
 module.exports = {
   User,
@@ -168,6 +140,4 @@ module.exports = {
   Author,
   UserTrackList,
   PlayList,
-  PlayLists_Tracks,
-  UserTrackList_Tracks,
 };

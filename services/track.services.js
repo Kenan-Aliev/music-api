@@ -3,7 +3,6 @@ const ApiError = require("../utils/exceptions");
 const { Author } = require("../models/index.js");
 const { Genre } = require("../models/index.js");
 const { UserTrackList } = require("../models/index");
-const { UserTrackList_Tracks } = require("../models/index");
 
 class TrackService {
   async create(trackData) {
@@ -32,17 +31,13 @@ class TrackService {
 
   async addMusicToTrackList(userId, trackId) {
     const userTrackList = await UserTrackList.findOne({ where: { userId } });
-    const candidate = await UserTrackList_Tracks.findOne({
-      where: { trackListId: userTrackList.id, trackId },
-    });
-
+    const trackListTracks = await userTrackList.getTracks();
+    let candidate = trackListTracks.find((track) => track.id === trackId);
     if (candidate) {
       throw ApiError.ClientError("Такой трек в вашем списке уже существует");
     }
-    const newTrack = await UserTrackList_Tracks.create({
-      trackListId: userTrackList.id,
-      trackId,
-    });
+    const track = await Track.findOne({ where: { id: trackId } });
+    const newTrack = await userTrackList.addTrack(track);
     if (newTrack) {
       return {
         message: "Вы успешно добавили новый трек в список вашей музыки",
@@ -66,9 +61,8 @@ class TrackService {
 
   async deleteTrackFromTrackList(userId, trackId) {
     const trackList = await UserTrackList.findOne({ where: { userId } });
-    await UserTrackList_Tracks.destroy({
-      where: { trackListId: trackList.id, trackId },
-    });
+    const track = await Track.findOne({ where: { id: trackId } });
+    await trackList.removeTrack(track);
     const userTracks = await this.getUserTracks(userId);
     return {
       message: "Вы успешно удалили трек из вашего списка",
