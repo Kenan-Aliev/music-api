@@ -9,6 +9,7 @@ const genreRoutes = require("./routes/genre.routes");
 const tokenRoutes = require("./routes/tokens.routes");
 const trackRoutes = require("./routes/track.routes");
 const playlistRoutes = require("./routes/playlists.routes");
+const albumRoutes = require("./routes/albums.routes");
 // const trackListRoutes = require("./routes/tracklist.routes");
 const errorMiddleware = require("./middlewares//exception.middleware");
 
@@ -30,6 +31,7 @@ server.use("/genre", genreRoutes);
 server.use("/token", tokenRoutes);
 server.use("/track", trackRoutes);
 server.use("/playlist", playlistRoutes);
+server.use("/album", albumRoutes);
 
 // server.use("/trackList", trackListRoutes);
 server.use(errorMiddleware);

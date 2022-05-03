@@ -106,7 +106,7 @@ class TrackService {
       include: [
         {
           model: Author,
-          attributes: ["name"],
+          attributes: ["id", "name"],
         },
         {
           model: Genre,

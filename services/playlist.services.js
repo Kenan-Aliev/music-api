@@ -49,7 +49,7 @@ class PlaylistServices {
         ],
       },
     });
-    return { users: usersPlaylists };
+    return usersPlaylists;
   }
 
   async createNewPlaylist(userId, playlistName) {

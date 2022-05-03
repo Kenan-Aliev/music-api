@@ -102,11 +102,36 @@ const PlayList = db.define("playlists", {
   },
 });
 
+const Album = db.define("albums", {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  year: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+});
+
 //relations
 Author.hasMany(Track, {
   onDelete: "cascade",
 });
 Track.belongsTo(Author);
+
+Author.hasMany(Album, {
+  onDelete: "cascade",
+});
+Album.belongsTo(Author);
+
+Album.hasMany(Track);
+Track.belongsTo(Album);
 
 Genre.hasMany(Track, {
   onDelete: "cascade",
@@ -140,4 +165,5 @@ module.exports = {
   Author,
   UserTrackList,
   PlayList,
+  Album,
 };
