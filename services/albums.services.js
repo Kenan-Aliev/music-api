@@ -82,6 +82,40 @@ class AlbumServices {
     const albums = await this.getAllAlbums();
     return albums;
   }
+
+  async getAlbumTracks(albumId) {
+    const albumTracks = await Album.findOne({
+      where: { id: albumId },
+      attributes: [
+        "id",
+        "name",
+        "year",
+        [
+          sequelize.literal(
+            '(SELECT name FROM "authors" WHERE "albums"."authorId" = "authors"."id")'
+          ),
+          "author",
+        ],
+        [
+          sequelize.literal(
+            '(SELECT Count(*) FROM "tracks" WHERE "albums"."id" = "tracks"."albumId")'
+          ),
+          "tracksCount",
+        ],
+      ],
+      include: {
+        model: Track,
+        attributes: ["id", "name"],
+      },
+    });
+    return albumTracks;
+  }
+
+  async deleteTrack(albumId, trackId) {
+    await Track.update({ albumId: null }, { where: { id: trackId } });
+    const album = await this.getAlbumTracks(albumId);
+    return album;
+  }
 }
 
 module.exports = new AlbumServices();

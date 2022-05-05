@@ -88,6 +88,22 @@ class PlaylistController {
       next(err);
     }
   }
+
+  async deleteUserPlaylist(req, res, next) {
+    try {
+      const { userId, playlistId } = req.params;
+      const user_playlists = await playlistServices.deleteUserPlaylist(
+        userId,
+        playlistId
+      );
+      return res.json({
+        message: "Вы успешно удалили плейлист пользователя",
+        user_playlists,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new PlaylistController();

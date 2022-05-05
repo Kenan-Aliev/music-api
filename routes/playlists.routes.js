@@ -44,4 +44,10 @@ router.delete(
   playlistsController.deleteTrackFromPlaylist
 );
 
+router.delete(
+  "/deletePlaylist/:playlistId/:userId",
+  roleMiddleware(["admin"]),
+  playlistsController.deleteUserPlaylist
+);
+
 module.exports = router;

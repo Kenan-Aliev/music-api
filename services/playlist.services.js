@@ -66,9 +66,41 @@ class PlaylistServices {
     return { message: "Вы успешно создали новый плейлист", playlists };
   }
 
-  async getUserPlaylists(userId) {
-    const playlists = await PlayList.findAll({ where: { userId } });
-    return playlists;
+  async getUserPlaylists(userId, userDataIncluded = false) {
+    let userPlaylists;
+    if (!userDataIncluded) {
+      userPlaylists = await PlayList.findAll({ where: { userId } });
+    } else {
+      userPlaylists = await User.findOne({
+        where: { id: userId },
+        attributes: [
+          "id",
+          "username",
+          "email",
+          [
+            sequelize.literal(
+              '(SELECT COUNT(*) FROM "playlists" WHERE "playlists"."userId" = "users"."id")'
+            ),
+            "playlistsCount",
+          ],
+        ],
+        include: {
+          model: PlayList,
+          as: "playlists",
+          attributes: [
+            "id",
+            "playList_name",
+            [
+              sequelize.literal(
+                '(SELECT COUNT(*) FROM "playlists_tracks" WHERE "playlists"."id" = "playlists_tracks"."playlistId")'
+              ),
+              "tracksCount",
+            ],
+          ],
+        },
+      });
+    }
+    return userPlaylists;
   }
 
   async getPLTracks(userId, playlistId) {
@@ -150,6 +182,12 @@ class PlaylistServices {
       message: "Вы успешно удалили трек из плейлиста",
       tracks: tracks.tracks,
     };
+  }
+
+  async deleteUserPlaylist(userId, playlistId) {
+    await PlayList.destroy({ where: { id: playlistId, userId } });
+    const user_playlists = await this.getUserPlaylists(userId, true);
+    return user_playlists;
   }
 }
 

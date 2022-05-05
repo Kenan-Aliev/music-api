@@ -18,6 +18,18 @@ class AlbumController {
       next(err);
     }
   }
+  async deleteTrack(req, res, next) {
+    try {
+      const { albumId, trackId } = req.params;
+      const album = await albumServices.deleteTrack(albumId, trackId);
+      return res.json({
+        message: "Вы успешно удалили трек из альбома",
+        album,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new AlbumController();
