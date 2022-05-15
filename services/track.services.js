@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Track } = require("../models/index.js");
 const ApiError = require("../utils/exceptions");
 const { Author } = require("../models/index.js");
@@ -20,8 +21,46 @@ class TrackService {
     if (!track) {
       throw new Error("Что-то пошло не так");
     }
-    const tracks = await this.getAllTracks();
-    return { message: "Вы успешно добавили новую песню", tracks };
+    const newTrack = await this.getTrack(track.id);
+    return { message: "Вы успешно добавили новую песню", newTrack };
+  }
+
+  async search(filters) {
+    for (let filter in filters) {
+      if (!filters[filter]) {
+        delete filters[filter];
+      } else if (
+        filters[filter] &&
+        typeof filters[filter] === "string" &&
+        isNaN(Number(filters[filter]))
+      ) {
+        filters[filter] = {
+          [Op.iLike]: "%" + filters[filter] + "%",
+        };
+      } else if (filters[filter] && !isNaN(Number(filters[filter]))) {
+        filters[filter] = Number(filters[filter]);
+      }
+    }
+    let tracks = await Track.findAll({
+      where: {
+        ...filters,
+      },
+      include: [
+        {
+          model: Author,
+          attributes: ["id", "name"],
+        },
+        {
+          model: Genre,
+          attributes: ["name"],
+        },
+      ],
+      attributes: {
+        exclude: ["genreId", "authorId"],
+      },
+    });
+
+    return tracks;
   }
 
   async getAll() {
@@ -68,6 +107,26 @@ class TrackService {
       message: "Вы успешно удалили трек из вашего списка",
       tracks: userTracks.tracks,
     };
+  }
+
+  async getTrack(trackId) {
+    const track = await Track.findOne({
+      where: { id: trackId },
+      include: [
+        {
+          model: Author,
+          attributes: ["id", "name"],
+        },
+        {
+          model: Genre,
+          attributes: ["name"],
+        },
+      ],
+      attributes: {
+        exclude: ["genreId", "authorId"],
+      },
+    });
+    return track;
   }
 
   async getUserTracks(userId) {

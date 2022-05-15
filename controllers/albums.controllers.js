@@ -12,8 +12,8 @@ class AlbumController {
 
   async addNewAlbum(req, res, next) {
     try {
-      const albums = await albumServices.addNewAlbum(req.body);
-      return res.json({ message: "Вы успешно создали новый альбом", albums });
+      const album = await albumServices.addNewAlbum(req.body);
+      return res.json({ message: "Вы успешно создали новый альбом", album });
     } catch (err) {
       next(err);
     }

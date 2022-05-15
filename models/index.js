@@ -119,6 +119,24 @@ const Album = db.define("albums", {
   },
 });
 
+const UserTrackList_Tracks = db.define("userTrackList_tracks", {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+});
+
+const Playlists_Tracks = db.define("playlists_tracks", {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  },
+});
+
 //relations
 Author.hasMany(Track, {
   onDelete: "cascade",
@@ -146,16 +164,16 @@ User.hasOne(UserTrackList, {
 });
 UserTrackList.belongsTo(User);
 
-UserTrackList.belongsToMany(Track, { through: "userTrackList_tracks" });
-Track.belongsToMany(UserTrackList, { through: "userTrackList_tracks" });
+UserTrackList.belongsToMany(Track, { through: UserTrackList_Tracks });
+Track.belongsToMany(UserTrackList, { through: UserTrackList_Tracks });
 
 User.hasMany(PlayList, {
   onDelete: "cascade",
 });
 PlayList.belongsTo(User);
 
-PlayList.belongsToMany(Track, { through: "playlists_tracks" });
-Track.belongsToMany(PlayList, { through: "playlists_tracks" });
+PlayList.belongsToMany(Track, { through: Playlists_Tracks });
+Track.belongsToMany(PlayList, { through: Playlists_Tracks });
 
 module.exports = {
   User,

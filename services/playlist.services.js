@@ -161,10 +161,15 @@ class PlaylistServices {
     return { message: "Вы успешно добавили трек в плейлист(ы)" };
   }
 
-  async deleteUserPlaylist(userId, playlistId) {
+  async deletePlaylist(userId, playlistId, role) {
     await PlayList.destroy({ where: { userId, id: playlistId } });
-    const playlists = await this.getUserPlaylists(userId);
-    return { message: "Вы успешно удалили плейлист", playlists };
+    let user_playlists;
+    if (role === "user") {
+      user_playlists = await this.getUserPlaylists(userId);
+    } else if (role === "admin") {
+      user_playlists = await this.getUserPlaylists(userId, true);
+    }
+    return user_playlists;
   }
 
   async deleteTrackFromPlaylist(playlistId, trackId, userId) {
@@ -182,12 +187,6 @@ class PlaylistServices {
       message: "Вы успешно удалили трек из плейлиста",
       tracks: tracks.tracks,
     };
-  }
-
-  async deleteUserPlaylist(userId, playlistId) {
-    await PlayList.destroy({ where: { id: playlistId, userId } });
-    const user_playlists = await this.getUserPlaylists(userId, true);
-    return user_playlists;
   }
 }
 

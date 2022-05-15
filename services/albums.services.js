@@ -79,8 +79,8 @@ class AlbumServices {
       );
     }
     // получаем альбомы и возвращаем их
-    const albums = await this.getAllAlbums();
-    return albums;
+    const album = await this.getAlbumTracks(res.id);
+    return album;
   }
 
   async getAlbumTracks(albumId) {

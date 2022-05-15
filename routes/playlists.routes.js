@@ -35,7 +35,7 @@ router.post(
 router.delete(
   "/delete/:playlistId",
   roleMiddleware(["user"]),
-  playlistsController.deleteUserPlaylist
+  playlistsController.deletePlaylist
 );
 
 router.delete(

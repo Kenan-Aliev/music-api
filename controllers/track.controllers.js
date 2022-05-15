@@ -20,6 +20,15 @@ class TrackController {
     }
   }
 
+  async search(req, res, next) {
+    try {
+      const tracks = await trackService.search(req.query);
+      return res.json({ message: "Вы успешно получили треки", tracks });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async addMusicToTrackList(req, res, next) {
     try {
       const userId = req.user.userId;

@@ -60,15 +60,16 @@ class PlaylistController {
     }
   }
 
-  async deleteUserPlaylist(req, res, next) {
+  async deletePlaylist(req, res, next) {
     try {
       const userId = req.user.userId;
       const { playlistId } = req.params;
-      const response = await playlistServices.deleteUserPlaylist(
+      const playlists = await playlistServices.deletePlaylist(
         userId,
-        Number(playlistId)
+        Number(playlistId),
+        "user"
       );
-      return res.json(response);
+      return res.json({ message: "Вы успешно удалили плейлист", playlists });
     } catch (err) {
       next(err);
     }
@@ -92,9 +93,10 @@ class PlaylistController {
   async deleteUserPlaylist(req, res, next) {
     try {
       const { userId, playlistId } = req.params;
-      const user_playlists = await playlistServices.deleteUserPlaylist(
+      const user_playlists = await playlistServices.deletePlaylist(
         userId,
-        playlistId
+        playlistId,
+        "admin"
       );
       return res.json({
         message: "Вы успешно удалили плейлист пользователя",
