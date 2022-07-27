@@ -1,4 +1,6 @@
 const { Op } = require("sequelize");
+const fs = require("fs");
+const path = require("path");
 const { Track } = require("../models/index.js");
 const ApiError = require("../utils/exceptions");
 const { Author } = require("../models/index.js");
@@ -6,7 +8,28 @@ const { Genre } = require("../models/index.js");
 const { UserTrackList } = require("../models/index");
 
 class TrackService {
-  async create(trackData) {
+  async create(trackData, audioFile) {
+    if (!audioFile) {
+      throw ApiError.ClientError("Загрузите аудиофайл");
+    }
+    const author = await Author.findOne({
+      where: {
+        id: trackData.authorId,
+      },
+    });
+    if (
+      !audioFile.name.toLowerCase().includes(trackData.name.toLowerCase()) ||
+      !audioFile.name.toLowerCase().includes(author.name.toLowerCase())
+    ) {
+      throw ApiError.ClientError(
+        "Название или автор указанной песни не совпадает с названием или автором загруженного файла"
+      );
+    }
+    const audioPath = path.join(_basedir, "music", audioFile.name);
+    if (fs.existsSync(audioPath)) {
+      throw ApiError.ClientError("Такой файл уже существует");
+    }
+
     const candidate = await Track.findOne({
       where: { name: trackData.name, authorId: trackData.authorId },
     });
@@ -17,11 +40,17 @@ class TrackService {
       name: trackData.name,
       authorId: trackData.authorId,
       genreId: trackData.genreId,
+      audioName: audioFile.name,
     });
     if (!track) {
       throw new Error("Что-то пошло не так");
     }
     const newTrack = await this.getTrack(track.id);
+    audioFile.mv(audioPath, function (err) {
+      if (err) {
+        throw new Error(err.message);
+      }
+    });
     return { message: "Вы успешно добавили новую песню", newTrack };
   }
 
@@ -92,6 +121,12 @@ class TrackService {
 
   async delete(items) {
     for (let i = 0; i < items.length; i++) {
+      const track = await Track.findOne({
+        where: {
+          id: items[i],
+        },
+      });
+      fs.rmSync(path.join(_basedir, "music", track.audioName));
       await Track.destroy({ where: { id: items[i] } });
     }
     const tracks = await this.getAllTracks();

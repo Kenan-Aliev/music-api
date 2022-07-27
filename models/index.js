@@ -39,6 +39,10 @@ const Track = db.define("tracks", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  audioName: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
 });
 
 const Token = db.define("tokens", {

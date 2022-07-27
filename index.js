@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const fileUpload = require("express-fileupload");
 require("dotenv").config();
 const db = require("./db.js");
 const authRoutes = require("./routes/auth.routes");
@@ -14,9 +15,10 @@ const albumRoutes = require("./routes/albums.routes");
 const errorMiddleware = require("./middlewares//exception.middleware");
 
 const PORT = process.env.PORT || 5000;
-
+global._basedir = __dirname
 const server = express();
-
+server.use(express.static(__dirname + "/music"));
+server.use(fileUpload({}));
 server.use(express.json());
 server.use(cookieParser());
 server.use(

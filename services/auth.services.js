@@ -6,7 +6,6 @@ const trackListService = require("../services/tracklist.services");
 
 class AuthServices {
   async registration(userData) {
-    console.log(userData);
     const hashedPassword = await bcrypt.hash(userData.password, 8);
     const user = await User.create({
       email: userData.email,

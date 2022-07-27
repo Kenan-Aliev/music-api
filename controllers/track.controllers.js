@@ -4,7 +4,8 @@ class TrackController {
   async create(req, res, next) {
     try {
       const trackData = req.body;
-      const response = await trackService.create(trackData);
+      const audioFile = req.files.audio;
+      const response = await trackService.create(trackData, audioFile);
       return res.json(response);
     } catch (err) {
       next(err);
