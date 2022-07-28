@@ -15,7 +15,7 @@ const albumRoutes = require("./routes/albums.routes");
 const errorMiddleware = require("./middlewares//exception.middleware");
 
 const PORT = process.env.PORT || 5000;
-global._basedir = __dirname
+global._basedir = __dirname;
 const server = express();
 server.use(express.static(__dirname + "/music"));
 server.use(fileUpload({}));
