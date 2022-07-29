@@ -111,6 +111,33 @@ class AlbumServices {
     return albumTracks;
   }
 
+  async addNewTracksToAlbum(albumId, newTracks) {
+    let isForeignTrack = false;
+    const album = await Album.findOne({
+      where: {
+        id: albumId,
+      },
+    });
+    isForeignTrack = newTracks.some((t) => t.author.id !== album.authorId);
+    if (isForeignTrack) {
+      throw ApiError.ClientError(
+        "Нельзя добавить в альбом исполнителя чужие песни"
+      );
+    }
+    for (let track of newTracks) {
+      await Track.update(
+        {
+          albumId,
+        },
+        {
+          where: { id: track.id },
+        }
+      );
+    }
+    const albumNewData = await this.getAlbumTracks(albumId);
+    return albumNewData;
+  }
+
   async deleteTrack(albumId, trackId) {
     await Track.update({ albumId: null }, { where: { id: trackId } });
     const album = await this.getAlbumTracks(albumId);

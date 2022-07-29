@@ -18,6 +18,20 @@ class AlbumController {
       next(err);
     }
   }
+
+  async addNewTracksToAlbum(req, res, next) {
+    try {
+      const { albumID, tracks } = req.body;
+      const album = await albumServices.addNewTracksToAlbum(albumID, tracks);
+      return res.json({
+        message: "Вы успешно добавили новые треки в альбом",
+        album,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async deleteTrack(req, res, next) {
     try {
       const { albumId, trackId } = req.params;
