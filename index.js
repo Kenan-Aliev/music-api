@@ -24,7 +24,7 @@ server.use(cookieParser());
 server.use(
   cors({
     credentials: true,
-    origin: "http://localhost:3000",
+    origin: "https://music-platform-react.herokuapp.com",
   })
 );
 server.use("/auth", authRoutes);
