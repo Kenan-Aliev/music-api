@@ -10,12 +10,12 @@ const sequelize = new Sequelize(
     host: process.env.DATABASE_HOST,
     // port: process.env.DATABASE_PORT,
     dialect: "postgres",
-    // dialectOptions: {
-    //   ssl: {
-    //     require: true,
-    //     rejectUnauthorized: false,
-    //   },
-    // },
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
     define: {
       timestamps: false,
     },
