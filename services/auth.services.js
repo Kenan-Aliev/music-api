@@ -10,7 +10,7 @@ class AuthServices {
     const user = await User.create({
       email: userData.email,
       username: userData.username,
-      // role: "admin",
+      role: "admin",
       password: hashedPassword,
     });
     if (user.role !== "admin") {
