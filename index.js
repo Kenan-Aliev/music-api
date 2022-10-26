@@ -24,7 +24,7 @@ server.use(cookieParser());
 server.use(
   cors({
     credentials: true,
-    origin: "https://music-platform-react.herokuapp.com",
+    origin: "https://music-platform-lg9s.vercel.app",
   })
 );
 server.use("/auth", authRoutes);
